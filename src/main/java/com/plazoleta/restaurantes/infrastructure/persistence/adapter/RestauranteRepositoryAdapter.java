@@ -8,6 +8,10 @@ import com.plazoleta.restaurantes.infrastructure.entity.EntidadRestaurante;
 import com.plazoleta.restaurantes.infrastructure.persistence.mapper.IRestauranteEntityMapper;
 import com.plazoleta.restaurantes.infrastructure.persistence.repository.IRestauranteJpaRepository;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,5 +49,12 @@ public class RestauranteRepositoryAdapter implements RestauranteRepositoryPort {
     public Optional<Restaurante> findByIdPropietario(Long idPropietario) {
         return jpaRepository.findByIdPropietario(idPropietario)
                 .map(mapper::toDomain);
+    }
+
+    @Override
+    public Page<Restaurante> findAllOrderedByName(Pageable pageable) {
+        Pageable sorted = PageRequest.of(
+                pageable.getPageNumber(), pageable.getPageSize(), Sort.by("nombre"));
+        return jpaRepository.findAll(sorted).map(mapper::toDomain);
     }
 }

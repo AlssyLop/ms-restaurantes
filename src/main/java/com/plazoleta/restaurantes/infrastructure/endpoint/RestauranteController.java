@@ -2,6 +2,8 @@ package com.plazoleta.restaurantes.infrastructure.endpoint;
 
 import com.plazoleta.restaurantes.application.dto.request.RestaurantePost;
 import com.plazoleta.restaurantes.application.dto.response.RestauranteCreado;
+import com.plazoleta.restaurantes.application.dto.response.RestaurantePageResponse;
+import com.plazoleta.restaurantes.application.handle.ListarRestaurantesHandle;
 import com.plazoleta.restaurantes.application.handle.RestauranteHandle;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,9 +14,11 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -23,9 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class RestauranteController {
 
     private final RestauranteHandle restauranteHandle;
+    private final ListarRestaurantesHandle listarRestaurantesHandle;
 
-    public RestauranteController(RestauranteHandle restauranteHandle) {
+    public RestauranteController(RestauranteHandle restauranteHandle,
+                                 ListarRestaurantesHandle listarRestaurantesHandle) {
         this.restauranteHandle = restauranteHandle;
+        this.listarRestaurantesHandle = listarRestaurantesHandle;
     }
 
     @PostMapping
@@ -41,5 +48,18 @@ public class RestauranteController {
             @Valid @RequestBody RestaurantePost request) {
         RestauranteCreado response = restauranteHandle.crearRestaurante(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('CLIENTE')")
+    @Operation(summary = "Listar restaurantes",
+            description = "Lista los restaurantes disponibles en orden alfabetico. Requiere autenticacion como CLIENTE.")
+    @ApiResponse(responseCode = "200", description = "Listado de restaurantes paginado",
+            content = @Content(schema = @Schema(implementation = RestaurantePageResponse.class)))
+    public ResponseEntity<RestaurantePageResponse> listarRestaurantes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        RestaurantePageResponse response = listarRestaurantesHandle.listarRestaurantes(page, size);
+        return ResponseEntity.ok(response);
     }
 }
