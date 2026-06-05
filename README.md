@@ -6,7 +6,7 @@ Microservicio de gestion de restaurantes para la plataforma Plaza de Comidas. Im
 
 - Java 25 + Spring Boot 4.0.6 + Maven (mvnw wrapper)
 - MySQL 8 (JPA con Hibernate, `ddl-auto=validate`)
-- Spring Security + SpringDoc OpenAPI 3.0.2
+- Spring Security + jjwt 0.12.6 + SpringDoc OpenAPI 3.0.2
 - Lombok + MapStruct 1.6.3
 - Pruebas: JUnit 5 + Mockito
 
@@ -35,6 +35,8 @@ com.plazoleta.restaurantes/
     endpoint/handler/ GlobalExceptionHandler
     entity/        EntidadRestaurante, EntidadPlato
     persistence/   adapter/ mapper/ repository/
+    security/      SecurityConfig (JWT filter chain)
+    security/jwt/  JwtTokenProvider, JwtAuthenticationFilter
     usuario/       UsuarioRestClienteAdapter
     usuario/dto/   UsuarioResponse
 ```
@@ -56,21 +58,37 @@ Conexion local: `root/root` en `localhost:3306/plazoleta_restaurantes`.
 
 ```bash
 ./mvnw spring-boot:run    # Puerto 8082
-./mvnw clean test         # Pruebas unitarias (23 tests)
+./mvnw clean test         # Pruebas unitarias (24 tests)
 ```
 
 ## Endpoints Implementados
 
-| Metodo | Ruta              | Descripcion                             |
-|--------|-------------------|-----------------------------------------|
-| POST   | `/restaurantes`   | Crear restaurante (admin)               |
-| POST   | `/platos`         | Crear plato (propietario autenticado)   |
+| Metodo | Ruta                | Descripcion                               | Autenticacion  |
+|--------|---------------------|-------------------------------------------|----------------|
+| POST   | `/restaurantes`     | Crear restaurante                         | ADMINISTRADOR  |
+| POST   | `/platos`           | Crear plato                               | PROPIETARIO    |
+| PUT    | `/platos/{idPlato}` | Modificar precio/descripcion de un plato  | PROPIETARIO    |
 
 Documentacion OpenAPI disponible en `/swagger-ui.html` y `/v3/api-docs`.
 
+## Seguridad JWT
+
+Todos los endpoints (excepto OpenAPI) requieren un token JWT válido emitido por `ms-usuarios`. El token se envía vía header:
+
+```
+Authorization: Bearer <token>
+```
+
+- **401** — token ausente, inválido o expirado (sin body)
+- **403** — token válido pero rol insuficiente (sin body)
+
+La validación usa la misma clave secreta (`jwt.secret`) compartida con `ms-usuarios`.
+
+---
+
 ## HU-2: Crear Restaurante
 
-Crea un restaurante validando que el propietario exista en `ms-usuarios` y tenga rol `PROPIETARIO`. Endpoint restringido a usuarios autenticados como ADMINISTRADOR.
+Crea un restaurante validando que el propietario exista en `ms-usuarios` y tenga rol `PROPIETARIO`. Endpoint restringido a ADMINISTRADOR.
 
 ### Validaciones de dominio
 
@@ -102,7 +120,7 @@ Crea un restaurante validando que el propietario exista en `ms-usuarios` y tenga
 
 ## HU-3: Crear Plato
 
-Crea un plato asociado al restaurante del propietario. El propietario se identifica por su `idPropietario` (sin JWT por ahora).
+Crea un plato asociado al restaurante del propietario autenticado (rol PROPIETARIO requerido).
 
 ### Validaciones de dominio (secuencial)
 
@@ -134,9 +152,30 @@ Crea un plato asociado al restaurante del propietario. El propietario se identif
 - **404**: propietario no existe o no tiene un restaurante registrado
 - **409**: conflicto (nombre de plato duplicado en el restaurante)
 
+## HU-4: Modificar Plato
+
+Modifica el precio y/o descripción de un plato existente. El propietario autenticado (rol PROPIETARIO) debe ser el dueño del restaurante al que pertenece el plato.
+
+### Request body
+
+```json
+{
+  "precio": 18000,
+  "descripcion": "Nueva descripcion del plato"
+}
+```
+
+### Respuestas
+
+- **200**: plato modificado (`{ "mensaje": "Plato modificado exitosamente" }`)
+- **400**: error de validacion (precio o descripcion invalidos)
+- **403**: el propietario no es dueno del restaurante del plato
+- **404**: plato no encontrado
+
+---
+
 ## Proximas HU (pendientes)
 
-- H4: Propietario modifica plato
 - H7: Propietario habilita/deshabilita plato
 - H9: Cliente lista restaurantes
 - H10: Cliente lista platos de un restaurante
