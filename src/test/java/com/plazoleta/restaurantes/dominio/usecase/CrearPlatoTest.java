@@ -3,6 +3,8 @@ package com.plazoleta.restaurantes.dominio.usecase;
 import com.plazoleta.restaurantes.dominio.modelo.Plato;
 import com.plazoleta.restaurantes.dominio.modelo.Restaurante;
 import com.plazoleta.restaurantes.dominio.modelo.UsuarioRestaurante;
+import com.plazoleta.restaurantes.application.exception.NombrePlatoDuplicadoException;
+import com.plazoleta.restaurantes.application.exception.PropietarioNoEncontradoException;
 import com.plazoleta.restaurantes.dominio.modelo.value.CategoriaPlato;
 import com.plazoleta.restaurantes.dominio.modelo.value.DescripcionPlato;
 import com.plazoleta.restaurantes.dominio.modelo.value.NombrePlato;
@@ -18,7 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DuplicateKeyException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -57,7 +58,7 @@ class CrearPlatoTest {
     }
 
     @Test
-    @DisplayName("Should create plato successfully with all valid fields")
+    @DisplayName("Deberia crear plato exitosamente con todos los campos validos")
     void crearPlato_AllValid_Success() {
         when(usuarioValidacion.consultarPorId(ID_PROPIETARIO))
                 .thenReturn(Optional.of(new UsuarioRestaurante(ID_PROPIETARIO, "PROPIETARIO")));
@@ -90,18 +91,18 @@ class CrearPlatoTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when propietario does not exist")
+    @DisplayName("Deberia lanzar excepcion cuando el propietario no existe")
     void crearPlato_PropietarioNoExiste_ThrowsException() {
         when(usuarioValidacion.consultarPorId(ID_PROPIETARIO)).thenReturn(Optional.empty());
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+        PropietarioNoEncontradoException ex = assertThrows(PropietarioNoEncontradoException.class,
                 () -> crearPlato.crearPlato(plato, ID_PROPIETARIO));
         assertEquals("El usuario con id " + ID_PROPIETARIO + " no existe", ex.getMessage());
         verify(platoRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Should throw exception when propietario has wrong role")
+    @DisplayName("Deberia lanzar excepcion cuando el propietario tiene rol incorrecto")
     void crearPlato_PropietarioRolIncorrecto_ThrowsException() {
         when(usuarioValidacion.consultarPorId(ID_PROPIETARIO))
                 .thenReturn(Optional.of(new UsuarioRestaurante(ID_PROPIETARIO, "CLIENTE")));
@@ -113,20 +114,20 @@ class CrearPlatoTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when restaurant not found for propietario")
+    @DisplayName("Deberia lanzar excepcion cuando el restaurante no existe")
     void crearPlato_RestauranteNoExiste_ThrowsException() {
         when(usuarioValidacion.consultarPorId(ID_PROPIETARIO))
                 .thenReturn(Optional.of(new UsuarioRestaurante(ID_PROPIETARIO, "PROPIETARIO")));
         when(restauranteRepository.findByIdPropietario(ID_PROPIETARIO)).thenReturn(Optional.empty());
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+        PropietarioNoEncontradoException ex = assertThrows(PropietarioNoEncontradoException.class,
                 () -> crearPlato.crearPlato(plato, ID_PROPIETARIO));
         assertEquals("El restaurante del usuario con id " + ID_PROPIETARIO + " no existe", ex.getMessage());
         verify(platoRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Should throw exception when plato name already exists in restaurant")
+    @DisplayName("Deberia lanzar excepcion cuando el nombre del plato ya existe")
     void crearPlato_NombreDuplicado_ThrowsException() {
         when(usuarioValidacion.consultarPorId(ID_PROPIETARIO))
                 .thenReturn(Optional.of(new UsuarioRestaurante(ID_PROPIETARIO, "PROPIETARIO")));
@@ -135,32 +136,32 @@ class CrearPlatoTest {
                         ID_RESTAURANTE, null, null, null, null, null, ID_PROPIETARIO, true)));
         when(platoRepository.existsByNombreAndIdRestaurante(any(), anyLong())).thenReturn(true);
 
-        DuplicateKeyException ex = assertThrows(DuplicateKeyException.class,
+        NombrePlatoDuplicadoException ex = assertThrows(NombrePlatoDuplicadoException.class,
                 () -> crearPlato.crearPlato(plato, ID_PROPIETARIO));
         assertTrue(ex.getMessage().contains("ya existe en el restaurante"));
         verify(platoRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Should throw exception when precio is zero")
+    @DisplayName("Deberia lanzar excepcion cuando el precio es cero")
     void crearPlato_PrecioCero_ThrowsException() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> new PrecioPlato(0));
-        assertEquals("El precio debe ser un numero entero positivo mayor a 0", ex.getMessage());
+        assertEquals("El precio no es v\u00E1lido", ex.getMessage());
         verifyNoInteractions(platoRepository, restauranteRepository, usuarioValidacion);
     }
 
     @Test
-    @DisplayName("Should throw exception when precio is negative")
+    @DisplayName("Deberia lanzar excepcion cuando el precio es negativo")
     void crearPlato_PrecioNegativo_ThrowsException() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> new PrecioPlato(-1));
-        assertEquals("El precio debe ser un numero entero positivo mayor a 0", ex.getMessage());
+        assertEquals("El precio no es v\u00E1lido", ex.getMessage());
         verifyNoInteractions(platoRepository, restauranteRepository, usuarioValidacion);
     }
 
     @Test
-    @DisplayName("Should throw exception when urlImagen has invalid format")
+    @DisplayName("Deberia lanzar excepcion cuando la url de imagen es invalida")
     void crearPlato_UrlImagenInvalida_ThrowsException() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> new UrlImagen("ftp://imagen.com/foto.jpg"));
@@ -169,7 +170,7 @@ class CrearPlatoTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when nombre is empty")
+    @DisplayName("Deberia lanzar excepcion cuando el nombre esta vacio")
     void crearPlato_NombreVacio_ThrowsException() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> new NombrePlato("   "));
@@ -178,7 +179,7 @@ class CrearPlatoTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when descripcion is empty")
+    @DisplayName("Deberia lanzar excepcion cuando la descripcion esta vacia")
     void crearPlato_DescripcionVacia_ThrowsException() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> new DescripcionPlato("   "));
@@ -187,7 +188,7 @@ class CrearPlatoTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when categoria is empty")
+    @DisplayName("Deberia lanzar excepcion cuando la categoria esta vacia")
     void crearPlato_CategoriaVacia_ThrowsException() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> new CategoriaPlato("   "));
@@ -196,7 +197,7 @@ class CrearPlatoTest {
     }
 
     @Test
-    @DisplayName("Should normalize spaces in nombre, descripcion and categoria")
+    @DisplayName("Deberia normalizar espacios en nombre, descripcion y categoria")
     void crearPlato_NormalizaEspacios_Success() {
         when(usuarioValidacion.consultarPorId(ID_PROPIETARIO))
                 .thenReturn(Optional.of(new UsuarioRestaurante(ID_PROPIETARIO, "PROPIETARIO")));

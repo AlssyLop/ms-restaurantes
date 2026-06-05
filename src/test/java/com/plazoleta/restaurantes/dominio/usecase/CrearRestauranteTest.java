@@ -49,7 +49,7 @@ class CrearRestauranteTest {
     }
 
     @Test
-    @DisplayName("Should create restaurant successfully with all valid fields")
+    @DisplayName("Deberia crear restaurante exitosamente con todos los campos validos")
     void crearRestaurante_AllValid_Success() {
         when(usuarioValidacion.consultarPorId(1L))
                 .thenReturn(Optional.of(new UsuarioRestaurante(1L, "PROPIETARIO")));
@@ -79,7 +79,7 @@ class CrearRestauranteTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when propietario does not exist")
+    @DisplayName("Deberia lanzar excepcion cuando el propietario no existe")
     void crearRestaurante_PropietarioNoExiste_ThrowsException() {
         when(usuarioValidacion.consultarPorId(1L)).thenReturn(Optional.empty());
 
@@ -90,7 +90,7 @@ class CrearRestauranteTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when propietario has wrong role")
+    @DisplayName("Deberia lanzar excepcion cuando el propietario tiene rol incorrecto")
     void crearRestaurante_PropietarioRolIncorrecto_ThrowsException() {
         when(usuarioValidacion.consultarPorId(1L))
                 .thenReturn(Optional.of(new UsuarioRestaurante(1L, "CLIENTE")));
@@ -102,7 +102,7 @@ class CrearRestauranteTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when nombre already exists")
+    @DisplayName("Deberia lanzar excepcion cuando el nombre ya existe")
     void crearRestaurante_NombreDuplicado_ThrowsException() {
         when(usuarioValidacion.consultarPorId(1L))
                 .thenReturn(Optional.of(new UsuarioRestaurante(1L, "PROPIETARIO")));
@@ -115,7 +115,7 @@ class CrearRestauranteTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when NIT already exists")
+    @DisplayName("Deberia lanzar excepcion cuando el NIT ya existe")
     void crearRestaurante_NitDuplicado_ThrowsException() {
         when(usuarioValidacion.consultarPorId(1L))
                 .thenReturn(Optional.of(new UsuarioRestaurante(1L, "PROPIETARIO")));
@@ -129,7 +129,7 @@ class CrearRestauranteTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when nombre contains only numbers")
+    @DisplayName("Deberia lanzar excepcion cuando el nombre contiene solo numeros")
     void crearRestaurante_NombreSoloNumeros_ThrowsException() {
         assertThrows(IllegalArgumentException.class,
                 () -> new NombreRestaurante("12345"));
@@ -137,7 +137,7 @@ class CrearRestauranteTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when NIT is not numeric")
+    @DisplayName("Deberia lanzar excepcion cuando el NIT no es numerico")
     void crearRestaurante_NitInvalido_ThrowsException() {
         assertThrows(IllegalArgumentException.class,
                 () -> new Nit("ABC123"));
@@ -145,7 +145,7 @@ class CrearRestauranteTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when telefono does not start with +")
+    @DisplayName("Deberia lanzar excepcion cuando el telefono no empieza con +")
     void crearRestaurante_TelefonoInvalido_ThrowsException() {
         assertThrows(IllegalArgumentException.class,
                 () -> new Telefono("573005698325"));
@@ -153,7 +153,7 @@ class CrearRestauranteTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when telefono exceeds 13 characters")
+    @DisplayName("Deberia lanzar excepcion cuando el telefono excede 13 caracteres")
     void crearRestaurante_TelefonoMuyLargo_ThrowsException() {
         assertThrows(IllegalArgumentException.class,
                 () -> new Telefono("+12345678901234"));
@@ -161,7 +161,7 @@ class CrearRestauranteTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when urlLogo has invalid format")
+    @DisplayName("Deberia lanzar excepcion cuando la url del logo es invalida")
     void crearRestaurante_UrlLogoInvalido_ThrowsException() {
         assertThrows(IllegalArgumentException.class,
                 () -> new UrlLogo("ftp://logo.com/logo.png"));
@@ -169,7 +169,7 @@ class CrearRestauranteTest {
     }
 
     @Test
-    @DisplayName("Should throw exception when idPropietario is null")
+    @DisplayName("Deberia lanzar excepcion cuando el idPropietario es nulo")
     void crearRestaurante_IdPropietarioNulo_ThrowsException() {
         when(usuarioValidacion.consultarPorId(null)).thenReturn(Optional.empty());
 
