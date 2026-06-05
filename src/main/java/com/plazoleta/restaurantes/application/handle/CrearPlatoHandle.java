@@ -1,6 +1,7 @@
 package com.plazoleta.restaurantes.application.handle;
 
 import com.plazoleta.restaurantes.application.dto.request.CrearPlatoRequest;
+import com.plazoleta.restaurantes.application.dto.response.CrearPlatoResponse;
 import com.plazoleta.restaurantes.application.factory.PlatoFactory;
 import com.plazoleta.restaurantes.dominio.api.CrearPlatoPort;
 import com.plazoleta.restaurantes.dominio.modelo.Plato;
@@ -19,8 +20,9 @@ public class CrearPlatoHandle {
         this.platoFactory = platoFactory;
     }
 
-    public void crearPlato(CrearPlatoRequest request) {
+    public CrearPlatoResponse crearPlato(CrearPlatoRequest request) {
         Plato plato = platoFactory.toDomain(request);
         crearPlatoPort.crearPlato(plato, request.getIdPropietario());
+        return new CrearPlatoResponse("Plato creado exitosamente");
     }
 }

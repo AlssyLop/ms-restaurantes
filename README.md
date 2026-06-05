@@ -24,7 +24,7 @@ com.plazoleta.restaurantes/
 
   application/                      # orquestacion
     dto/request/   RestaurantePost, CrearPlatoRequest
-    dto/response/  RestauranteCreado
+    dto/response/  RestauranteCreado, CrearPlatoResponse
     exception/     ErrorResponse
     factory/       RestauranteFactory, PlatoFactory
     handle/        RestauranteHandle, CrearPlatoHandle
@@ -129,7 +129,7 @@ Crea un plato asociado al restaurante del propietario. El propietario se identif
 
 ### Respuestas
 
-- **201**: plato creado (sin cuerpo en la respuesta)
+- **201**: plato creado (`{ "mensaje": "Plato creado exitosamente" }`)
 - **400**: error de validacion (nombre/precio/descripcion/URL/categoria invalidos, propietario sin rol PROPIETARIO)
 - **404**: propietario no existe o no tiene un restaurante registrado
 - **409**: conflicto (nombre de plato duplicado en el restaurante)
