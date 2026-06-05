@@ -6,6 +6,7 @@ import com.plazoleta.restaurantes.dominio.spi.PlatoRepositoryPort;
 import com.plazoleta.restaurantes.infrastructure.entity.EntidadPlato;
 import com.plazoleta.restaurantes.infrastructure.persistence.mapper.IPlatoEntityMapper;
 import com.plazoleta.restaurantes.infrastructure.persistence.repository.IPlatoJpaRepository;
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,5 +33,10 @@ public class PlatoRepositoryAdapter implements PlatoRepositoryPort {
     @Override
     public boolean existsByNombreAndIdRestaurante(NombrePlato nombre, Long idRestaurante) {
         return jpaRepository.existsByNombreAndIdRestaurante(nombre.getValor(), idRestaurante);
+    }
+
+    @Override
+    public Optional<Plato> findById(Long id) {
+        return jpaRepository.findById(id).map(mapper::toDomain);
     }
 }
