@@ -10,7 +10,7 @@ public class PrecioPlato {
 
     private void validar() {
         if (valor == null || valor <= 0) {
-            throw new IllegalArgumentException("El precio debe ser un numero entero positivo mayor a 0");
+            throw new IllegalArgumentException("El precio no es válido");
         }
     }
 
