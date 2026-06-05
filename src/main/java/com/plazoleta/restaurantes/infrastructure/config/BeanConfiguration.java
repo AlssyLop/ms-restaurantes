@@ -1,11 +1,14 @@
 package com.plazoleta.restaurantes.infrastructure.config;
 
+import com.plazoleta.restaurantes.dominio.api.AsociarEmpleadoPort;
 import com.plazoleta.restaurantes.dominio.api.CrearPlatoPort;
 import com.plazoleta.restaurantes.dominio.api.CrearRestaurantePort;
 import com.plazoleta.restaurantes.dominio.api.ModificarPlatoPort;
+import com.plazoleta.restaurantes.dominio.spi.EmpleadoRestauranteRepositoryPort;
 import com.plazoleta.restaurantes.dominio.spi.PlatoRepositoryPort;
 import com.plazoleta.restaurantes.dominio.spi.RestauranteRepositoryPort;
 import com.plazoleta.restaurantes.dominio.spi.UsuarioValidacionPort;
+import com.plazoleta.restaurantes.dominio.usecase.AsociarEmpleado;
 import com.plazoleta.restaurantes.dominio.usecase.CrearPlato;
 import com.plazoleta.restaurantes.dominio.usecase.CrearRestaurante;
 import com.plazoleta.restaurantes.dominio.usecase.ModificarPlato;
@@ -33,5 +36,10 @@ public class BeanConfiguration {
                                                  RestauranteRepositoryPort restauranteRepository,
                                                  UsuarioValidacionPort usuarioValidacion) {
         return new ModificarPlato(platoRepository, restauranteRepository, usuarioValidacion);
+    }
+
+    @Bean
+    public AsociarEmpleadoPort asociarEmpleadoPort(EmpleadoRestauranteRepositoryPort repository) {
+        return new AsociarEmpleado(repository);
     }
 }
