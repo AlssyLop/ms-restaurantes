@@ -15,24 +15,25 @@ Microservicio de gestion de restaurantes para la plataforma Plaza de Comidas. Im
 ```
 com.plazoleta.restaurantes/
   domain/                          # nucleo puro, sin Spring
-    api/          CrearRestaurantePort
-    modelo/       Restaurante, UsuarioRestaurante
-    modelo/value/ NombreRestaurante, Nit, Telefono, UrlLogo, RolPropietario
-    spi/          RestauranteRepositoryPort, UsuarioValidacionPort
-    usecase/      CrearRestaurante
+    api/          CrearRestaurantePort, CrearPlatoPort
+    modelo/       Restaurante, UsuarioRestaurante, Plato
+    modelo/value/ NombreRestaurante, Nit, Telefono, UrlLogo, RolPropietario,
+                  NombrePlato, PrecioPlato, DescripcionPlato, UrlImagen, CategoriaPlato
+    spi/          RestauranteRepositoryPort, UsuarioValidacionPort, PlatoRepositoryPort
+    usecase/      CrearRestaurante, CrearPlato
 
   application/                      # orquestacion
-    dto/request/   RestaurantePost
-    dto/response/  RestauranteCreado
+    dto/request/   RestaurantePost, CrearPlatoRequest
+    dto/response/  RestauranteCreado, CrearPlatoResponse
     exception/     ErrorResponse
-    factory/       RestauranteFactory
-    handle/        RestauranteHandle
+    factory/       RestauranteFactory, PlatoFactory
+    handle/        RestauranteHandle, CrearPlatoHandle
 
   infrastructure/                   # adaptadores (Spring, JPA, HTTP)
     config/        BeanConfiguration, RestTemplateConfig
-    endpoint/      RestauranteController
+    endpoint/      RestauranteController, PlatoController
     endpoint/handler/ GlobalExceptionHandler
-    entity/        EntidadRestaurante
+    entity/        EntidadRestaurante, EntidadPlato
     persistence/   adapter/ mapper/ repository/
     usuario/       UsuarioRestClienteAdapter
     usuario/dto/   UsuarioResponse
@@ -55,14 +56,15 @@ Conexion local: `root/root` en `localhost:3306/plazoleta_restaurantes`.
 
 ```bash
 ./mvnw spring-boot:run    # Puerto 8082
-./mvnw clean test         # Pruebas unitarias (11 tests)
+./mvnw clean test         # Pruebas unitarias (23 tests)
 ```
 
 ## Endpoints Implementados
 
-| Metodo | Ruta              | Descripcion                      |
-|--------|-------------------|----------------------------------|
-| POST   | `/restaurantes`   | Crear restaurante (admin)        |
+| Metodo | Ruta              | Descripcion                             |
+|--------|-------------------|-----------------------------------------|
+| POST   | `/restaurantes`   | Crear restaurante (admin)               |
+| POST   | `/platos`         | Crear plato (propietario autenticado)   |
 
 Documentacion OpenAPI disponible en `/swagger-ui.html` y `/v3/api-docs`.
 
@@ -98,9 +100,42 @@ Crea un restaurante validando que el propietario exista en `ms-usuarios` y tenga
 - **404**: propietario no existe en `ms-usuarios`
 - **409**: conflicto (nombre o NIT duplicado)
 
+## HU-3: Crear Plato
+
+Crea un plato asociado al restaurante del propietario. El propietario se identifica por su `idPropietario` (sin JWT por ahora).
+
+### Validaciones de dominio (secuencial)
+
+- **Nombre**: normalizado (trim + colapso de espacios), requerido, unico dentro del mismo restaurante
+- **Precio**: entero positivo mayor a 0
+- **Descripcion**: normalizada (trim + colapso de espacios), requerida
+- **URL de imagen**: formato `http(s)://...` valido
+- **Categoria**: normalizada (trim + colapso de espacios), requerida
+- **Propietario**: debe existir en `ms-usuarios` con rol `PROPIETARIO`
+- **Restaurante**: debe existir un restaurante registrado para ese propietario
+
+### Request body
+
+```json
+{
+  "nombre": "Pollo a la Brasa",
+  "precio": 15000,
+  "descripcion": "Delicioso pollo acompanado de papas",
+  "urlImagen": "http://imagen.com/pollo.jpg",
+  "categoria": "ALMUERZOS",
+  "idPropietario": 1
+}
+```
+
+### Respuestas
+
+- **201**: plato creado (`{ "mensaje": "Plato creado exitosamente" }`)
+- **400**: error de validacion (nombre/precio/descripcion/URL/categoria invalidos, propietario sin rol PROPIETARIO)
+- **404**: propietario no existe o no tiene un restaurante registrado
+- **409**: conflicto (nombre de plato duplicado en el restaurante)
+
 ## Proximas HU (pendientes)
 
-- H3: Propietario crea plato
 - H4: Propietario modifica plato
 - H7: Propietario habilita/deshabilita plato
 - H9: Cliente lista restaurantes
