@@ -4,6 +4,7 @@ import com.plazoleta.restaurantes.dominio.api.AsociarEmpleadoPort;
 import com.plazoleta.restaurantes.dominio.api.CrearPlatoPort;
 import com.plazoleta.restaurantes.dominio.api.CrearRestaurantePort;
 import com.plazoleta.restaurantes.dominio.api.HabilitarDeshabilitarPlatoPort;
+import com.plazoleta.restaurantes.dominio.api.ListarPlatosRestaurantePort;
 import com.plazoleta.restaurantes.dominio.api.ListarRestaurantesPort;
 import com.plazoleta.restaurantes.dominio.api.ModificarPlatoPort;
 import com.plazoleta.restaurantes.dominio.spi.EmpleadoRestauranteRepositoryPort;
@@ -14,6 +15,7 @@ import com.plazoleta.restaurantes.dominio.usecase.AsociarEmpleado;
 import com.plazoleta.restaurantes.dominio.usecase.CrearPlato;
 import com.plazoleta.restaurantes.dominio.usecase.CrearRestaurante;
 import com.plazoleta.restaurantes.dominio.usecase.GestionarPlato;
+import com.plazoleta.restaurantes.dominio.usecase.ListarPlatosRestaurante;
 import com.plazoleta.restaurantes.dominio.usecase.ListarRestaurantes;
 import com.plazoleta.restaurantes.dominio.usecase.ModificarPlato;
 import org.springframework.context.annotation.Bean;
@@ -57,5 +59,11 @@ public class BeanConfiguration {
     @Bean
     public ListarRestaurantesPort listarRestaurantesPort(RestauranteRepositoryPort restauranteRepository) {
         return new ListarRestaurantes(restauranteRepository);
+    }
+
+    @Bean
+    public ListarPlatosRestaurantePort listarPlatosRestaurantePort(PlatoRepositoryPort platoRepository,
+                                                                     RestauranteRepositoryPort restauranteRepository) {
+        return new ListarPlatosRestaurante(platoRepository, restauranteRepository);
     }
 }

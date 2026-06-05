@@ -52,6 +52,11 @@ public class RestauranteRepositoryAdapter implements RestauranteRepositoryPort {
     }
 
     @Override
+    public Optional<Restaurante> findById(Long id) {
+        return jpaRepository.findById(id).map(mapper::toDomain);
+    }
+
+    @Override
     public Page<Restaurante> findAllOrderedByName(Pageable pageable) {
         Pageable sorted = PageRequest.of(
                 pageable.getPageNumber(), pageable.getPageSize(), Sort.by("nombre"));

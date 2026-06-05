@@ -13,4 +13,5 @@ public interface RestauranteRepositoryPort {
     boolean existsByNit(Nit nit);
     Optional<Restaurante> findByIdPropietario(Long idPropietario);
     Page<Restaurante> findAllOrderedByName(Pageable pageable);
+    Optional<Restaurante> findById(Long id);
 }

@@ -1,8 +1,10 @@
 package com.plazoleta.restaurantes.infrastructure.endpoint;
 
 import com.plazoleta.restaurantes.application.dto.request.RestaurantePost;
+import com.plazoleta.restaurantes.application.dto.response.PlatoPageResponse;
 import com.plazoleta.restaurantes.application.dto.response.RestauranteCreado;
 import com.plazoleta.restaurantes.application.dto.response.RestaurantePageResponse;
+import com.plazoleta.restaurantes.application.handle.ListarPlatosRestauranteHandle;
 import com.plazoleta.restaurantes.application.handle.ListarRestaurantesHandle;
 import com.plazoleta.restaurantes.application.handle.RestauranteHandle;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,11 +31,14 @@ public class RestauranteController {
 
     private final RestauranteHandle restauranteHandle;
     private final ListarRestaurantesHandle listarRestaurantesHandle;
+    private final ListarPlatosRestauranteHandle listarPlatosRestauranteHandle;
 
     public RestauranteController(RestauranteHandle restauranteHandle,
-                                 ListarRestaurantesHandle listarRestaurantesHandle) {
+                                 ListarRestaurantesHandle listarRestaurantesHandle,
+                                 ListarPlatosRestauranteHandle listarPlatosRestauranteHandle) {
         this.restauranteHandle = restauranteHandle;
         this.listarRestaurantesHandle = listarRestaurantesHandle;
+        this.listarPlatosRestauranteHandle = listarPlatosRestauranteHandle;
     }
 
     @PostMapping
@@ -60,6 +66,23 @@ public class RestauranteController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         RestaurantePageResponse response = listarRestaurantesHandle.listarRestaurantes(page, size);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{idRestaurante}/platos")
+    @PreAuthorize("hasRole('CLIENTE')")
+    @Operation(summary = "Listar platos de un restaurante",
+            description = "Lista los platos activos de un restaurante, con paginacion y filtro opcional por categoria.")
+    @ApiResponse(responseCode = "200", description = "Listado de platos paginado",
+            content = @Content(schema = @Schema(implementation = PlatoPageResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Restaurante no encontrado")
+    public ResponseEntity<PlatoPageResponse> listarPlatosRestaurante(
+            @PathVariable Long idRestaurante,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String categoria) {
+        PlatoPageResponse response = listarPlatosRestauranteHandle.listarPlatos(
+                idRestaurante, categoria, page, size);
         return ResponseEntity.ok(response);
     }
 }

@@ -5,6 +5,7 @@ import com.plazoleta.restaurantes.application.exception.NombrePlatoDuplicadoExce
 import com.plazoleta.restaurantes.application.exception.PlatoNoEncontradoException;
 import com.plazoleta.restaurantes.application.exception.PlatoYaEnEseEstadoException;
 import com.plazoleta.restaurantes.application.exception.PropietarioNoEncontradoException;
+import com.plazoleta.restaurantes.application.exception.RestauranteNoEncontradoException;
 import com.plazoleta.restaurantes.application.exception.SinPermisoException;
 import java.util.List;
 import org.springframework.dao.DuplicateKeyException;
@@ -59,6 +60,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SinPermisoException.class)
     public ResponseEntity<Void> handleSinPermiso(SinPermisoException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @ExceptionHandler(RestauranteNoEncontradoException.class)
+    public ResponseEntity<Void> handleRestauranteNoEncontrado(RestauranteNoEncontradoException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @ExceptionHandler(PlatoYaEnEseEstadoException.class)
