@@ -3,6 +3,7 @@ package com.plazoleta.restaurantes.infrastructure.endpoint.handler;
 import com.plazoleta.restaurantes.application.exception.ErrorResponse;
 import com.plazoleta.restaurantes.application.exception.NombrePlatoDuplicadoException;
 import com.plazoleta.restaurantes.application.exception.PlatoNoEncontradoException;
+import com.plazoleta.restaurantes.application.exception.PlatoYaEnEseEstadoException;
 import com.plazoleta.restaurantes.application.exception.PropietarioNoEncontradoException;
 import com.plazoleta.restaurantes.application.exception.SinPermisoException;
 import java.util.List;
@@ -58,6 +59,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(SinPermisoException.class)
     public ResponseEntity<Void> handleSinPermiso(SinPermisoException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @ExceptionHandler(PlatoYaEnEseEstadoException.class)
+    public ResponseEntity<ErrorResponse> handlePlatoYaEnEseEstado(PlatoYaEnEseEstadoException ex) {
+        return ResponseEntity.badRequest()
+                .body(new ErrorResponse(ex.getMessage(), null));
     }
 
     @ExceptionHandler(Exception.class)
