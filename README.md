@@ -15,20 +15,23 @@ Microservicio de gestion de restaurantes para la plataforma Plaza de Comidas. Im
 ```
 com.plazoleta.restaurantes/
   domain/                          # nucleo puro, sin Spring
-    api/          CrearRestaurantePort, CrearPlatoPort, ModificarPlatoPort, AsociarEmpleadoPort
+    api/          CrearRestaurantePort, CrearPlatoPort, ModificarPlatoPort, AsociarEmpleadoPort,
+                   HabilitarDeshabilitarPlatoPort
     modelo/       Restaurante, UsuarioRestaurante, Plato, EmpleadoRestaurante
     modelo/value/ NombreRestaurante, Nit, Telefono, UrlLogo, RolPropietario,
                   NombrePlato, PrecioPlato, DescripcionPlato, UrlImagen, CategoriaPlato
     spi/          RestauranteRepositoryPort, UsuarioValidacionPort, PlatoRepositoryPort,
                   EmpleadoRestauranteRepositoryPort
-    usecase/      CrearRestaurante, CrearPlato, ModificarPlato, AsociarEmpleado
+    usecase/      CrearRestaurante, CrearPlato, ModificarPlato, AsociarEmpleado, GestionarPlato
 
   application/                      # orquestacion
     dto/request/   RestaurantePost, CrearPlatoRequest, ModificarPlatoRequest, AsociarEmpleadoRequest
-    dto/response/  RestauranteCreado, CrearPlatoResponse, ModificarPlatoResponse, AsociarEmpleadoResponse
-    exception/     ErrorResponse
+    dto/response/  RestauranteCreado, CrearPlatoResponse, ModificarPlatoResponse, AsociarEmpleadoResponse,
+                   GestionarPlatoResponse
+    exception/     ErrorResponse, PlatoYaEnEseEstadoException
     factory/       RestauranteFactory, PlatoFactory, EmpleadoRestauranteFactory
-    handle/        RestauranteHandle, CrearPlatoHandle, ModificarPlatoHandle, EmpleadoRestauranteHandle
+    handle/        RestauranteHandle, CrearPlatoHandle, ModificarPlatoHandle, EmpleadoRestauranteHandle,
+                   GestionarPlatoHandle
 
   infrastructure/                   # adaptadores (Spring, JPA, HTTP)
     config/        BeanConfiguration, RestTemplateConfig
@@ -59,7 +62,7 @@ Conexion local: `root/root` en `localhost:3306/plazoleta_restaurantes`.
 
 ```bash
 ./mvnw spring-boot:run    # Puerto 8082
-./mvnw clean test         # Pruebas unitarias (24 tests)
+./mvnw clean test         # Pruebas unitarias (46 tests)
 ```
 
 ## Endpoints Implementados
@@ -201,8 +204,34 @@ Asocia un empleado al restaurante del propietario autenticado. Llamado por `ms-u
 
 ---
 
+## HU-7: Habilitar/Deshabilitar Plato
+
+Habilita o deshabilita un plato del menú del restaurante del propietario autenticado (rol PROPIETARIO requerido).
+
+### Endpoints
+
+| Metodo | Ruta                       | Descripcion             | Autenticacion  |
+|--------|----------------------------|-------------------------|----------------|
+| PATCH  | `/platos/{idPlato}/habilitar`   | Habilitar plato         | PROPIETARIO    |
+| PATCH  | `/platos/{idPlato}/deshabilitar`| Deshabilitar plato      | PROPIETARIO    |
+
+### Validaciones de dominio
+
+- **Propietario**: debe existir en `ms-usuarios` con rol `PROPIETARIO`
+- **Restaurante**: debe existir un restaurante registrado para ese propietario
+- **Plato**: debe existir y pertenecer al restaurante del propietario
+- **Estado**: si el plato ya está en el estado solicitado, se rechaza la operación
+
+### Respuestas
+
+- **200**: operación exitosa
+  - `{ "mensaje": "Plato habilitado exitosamente" }`
+  - `{ "mensaje": "Plato deshabilitado exitosamente" }`
+- **400**: el plato ya se encuentra en ese estado (`{ "mensaje": "El plato ya se encuentra habilitado/deshabilitado" }`)
+- **403**: el propietario no es dueño del restaurante del plato
+- **404**: plato o propietario no encontrado
+
 ## Proximas HU (pendientes)
 
-- H7: Propietario habilita/deshabilita plato
 - H9: Cliente lista restaurantes
 - H10: Cliente lista platos de un restaurante
