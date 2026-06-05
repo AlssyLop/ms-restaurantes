@@ -5,6 +5,7 @@ import com.plazoleta.restaurantes.dominio.spi.EmpleadoRestauranteRepositoryPort;
 import com.plazoleta.restaurantes.infrastructure.entity.EntidadEmpleadoRestaurante;
 import com.plazoleta.restaurantes.infrastructure.persistence.mapper.IEmpleadoRestauranteEntityMapper;
 import com.plazoleta.restaurantes.infrastructure.persistence.repository.IEmpleadoRestauranteJpaRepository;
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,5 +32,10 @@ public class EmpleadoRestauranteRepositoryAdapter implements EmpleadoRestaurante
     @Override
     public boolean existsByEmpleadoAndRestaurante(Long idEmpleado, Long idRestaurante) {
         return jpaRepository.existsByIdEmpleadoAndIdRestaurante(idEmpleado, idRestaurante);
+    }
+
+    @Override
+    public Optional<EmpleadoRestaurante> findByIdEmpleado(Long idEmpleado) {
+        return jpaRepository.findByIdEmpleado(idEmpleado).map(mapper::toDomain);
     }
 }
