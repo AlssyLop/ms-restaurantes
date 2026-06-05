@@ -15,25 +15,26 @@ Microservicio de gestion de restaurantes para la plataforma Plaza de Comidas. Im
 ```
 com.plazoleta.restaurantes/
   domain/                          # nucleo puro, sin Spring
-    api/          CrearRestaurantePort, CrearPlatoPort
-    modelo/       Restaurante, UsuarioRestaurante, Plato
+    api/          CrearRestaurantePort, CrearPlatoPort, ModificarPlatoPort, AsociarEmpleadoPort
+    modelo/       Restaurante, UsuarioRestaurante, Plato, EmpleadoRestaurante
     modelo/value/ NombreRestaurante, Nit, Telefono, UrlLogo, RolPropietario,
                   NombrePlato, PrecioPlato, DescripcionPlato, UrlImagen, CategoriaPlato
-    spi/          RestauranteRepositoryPort, UsuarioValidacionPort, PlatoRepositoryPort
-    usecase/      CrearRestaurante, CrearPlato
+    spi/          RestauranteRepositoryPort, UsuarioValidacionPort, PlatoRepositoryPort,
+                  EmpleadoRestauranteRepositoryPort
+    usecase/      CrearRestaurante, CrearPlato, ModificarPlato, AsociarEmpleado
 
   application/                      # orquestacion
-    dto/request/   RestaurantePost, CrearPlatoRequest
-    dto/response/  RestauranteCreado, CrearPlatoResponse
+    dto/request/   RestaurantePost, CrearPlatoRequest, ModificarPlatoRequest, AsociarEmpleadoRequest
+    dto/response/  RestauranteCreado, CrearPlatoResponse, ModificarPlatoResponse, AsociarEmpleadoResponse
     exception/     ErrorResponse
-    factory/       RestauranteFactory, PlatoFactory
-    handle/        RestauranteHandle, CrearPlatoHandle
+    factory/       RestauranteFactory, PlatoFactory, EmpleadoRestauranteFactory
+    handle/        RestauranteHandle, CrearPlatoHandle, ModificarPlatoHandle, EmpleadoRestauranteHandle
 
   infrastructure/                   # adaptadores (Spring, JPA, HTTP)
     config/        BeanConfiguration, RestTemplateConfig
-    endpoint/      RestauranteController, PlatoController
+    endpoint/      RestauranteController, PlatoController, EmpleadoRestauranteController
     endpoint/handler/ GlobalExceptionHandler
-    entity/        EntidadRestaurante, EntidadPlato
+    entity/        EntidadRestaurante, EntidadPlato, EntidadEmpleadoRestaurante
     persistence/   adapter/ mapper/ repository/
     security/      SecurityConfig (JWT filter chain)
     security/jwt/  JwtTokenProvider, JwtAuthenticationFilter
@@ -68,6 +69,7 @@ Conexion local: `root/root` en `localhost:3306/plazoleta_restaurantes`.
 | POST   | `/restaurantes`     | Crear restaurante                         | ADMINISTRADOR  |
 | POST   | `/platos`           | Crear plato                               | PROPIETARIO    |
 | PUT    | `/platos/{idPlato}` | Modificar precio/descripcion de un plato  | PROPIETARIO    |
+| POST   | `/restaurantes/empleados` | Asociar empleado a restaurante       | PROPIETARIO    |
 
 Documentacion OpenAPI disponible en `/swagger-ui.html` y `/v3/api-docs`.
 
@@ -171,6 +173,31 @@ Modifica el precio y/o descripción de un plato existente. El propietario autent
 - **400**: error de validacion (precio o descripcion invalidos)
 - **403**: el propietario no es dueno del restaurante del plato
 - **404**: plato no encontrado
+
+---
+
+## HU-6: Asociar Empleado a Restaurante
+
+Asocia un empleado al restaurante del propietario autenticado. Llamado por `ms-usuarios` via RestTemplate despues de crear la cuenta del empleado. Endpoint protegido (requiere JWT de Propietario).
+
+### Validaciones de dominio
+
+- **Empleado duplicado**: no se puede asociar el mismo empleado dos veces al mismo restaurante
+
+### Request body
+
+```json
+{
+  "idEmpleado": 1,
+  "idCargo": 1
+}
+```
+
+### Respuestas
+
+- **201**: `{"mensaje": "Empleado asociado exitosamente"}`
+- **400**: error de validacion (empleado duplicado)
+- **404**: no se encontro restaurante para el propietario autenticado
 
 ---
 
