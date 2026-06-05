@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,6 +36,7 @@ public class PlatoController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('PROPIETARIO')")
     @Operation(summary = "Crear plato",
             description = "Crea un plato asociado al restaurante del propietario autenticado.")
     @ApiResponse(responseCode = "201", description = "Plato creado exitosamente",
@@ -48,6 +50,7 @@ public class PlatoController {
     }
 
     @PutMapping("/{idPlato}")
+    @PreAuthorize("hasRole('PROPIETARIO')")
     @Operation(summary = "Modificar plato",
             description = "Modifica precio y/o descripcion de un plato del propietario autenticado.")
     @ApiResponse(responseCode = "200", description = "Plato modificado exitosamente",
