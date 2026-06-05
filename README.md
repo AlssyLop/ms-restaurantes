@@ -254,6 +254,35 @@ Lista los restaurantes disponibles paginados, en orden alfabético por nombre. R
 }
 ```
 
-## Proximas HU (pendientes)
+## HU-10: Listar Platos de un Restaurante
 
-- H10: Cliente lista platos de un restaurante
+Lista los platos activos de un restaurante, con paginación y filtro opcional por categoría. Requiere autenticación como CLIENTE.
+
+### Endpoint
+
+| Metodo | Ruta | Descripcion | Autenticacion  |
+|--------|------|-------------|----------------|
+| GET    | `/restaurantes/{idRestaurante}/platos?page=0&size=10&categoria=string` | Listar platos del restaurante | CLIENTE |
+
+### Response 200
+
+```json
+{
+  "contenido": [
+    {
+      "nombre": "Pollo a la Brasa",
+      "precio": 15000,
+      "descripcion": "Delicioso pollo acompanado de papas",
+      "urlImagen": "http://imagen.com/pollo.jpg",
+      "categoria": "ALMUERZOS"
+    }
+  ],
+  "paginaActual": 0,
+  "totalPaginas": 3,
+  "totalElementos": 25
+}
+```
+
+### Response 404
+
+Restaurante no encontrado (sin body).
