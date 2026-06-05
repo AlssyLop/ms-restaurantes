@@ -7,6 +7,7 @@ import com.plazoleta.restaurantes.dominio.spi.RestauranteRepositoryPort;
 import com.plazoleta.restaurantes.infrastructure.entity.EntidadRestaurante;
 import com.plazoleta.restaurantes.infrastructure.persistence.mapper.IRestauranteEntityMapper;
 import com.plazoleta.restaurantes.infrastructure.persistence.repository.IRestauranteJpaRepository;
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,5 +39,11 @@ public class RestauranteRepositoryAdapter implements RestauranteRepositoryPort {
     @Override
     public boolean existsByNit(Nit nit) {
         return jpaRepository.existsByNit(nit.getValor());
+    }
+
+    @Override
+    public Optional<Restaurante> findByIdPropietario(Long idPropietario) {
+        return jpaRepository.findByIdPropietario(idPropietario)
+                .map(mapper::toDomain);
     }
 }
