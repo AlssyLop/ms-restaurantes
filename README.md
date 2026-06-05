@@ -231,7 +231,29 @@ Habilita o deshabilita un plato del menú del restaurante del propietario autent
 - **403**: el propietario no es dueño del restaurante del plato
 - **404**: plato o propietario no encontrado
 
+## HU-9: Listar Restaurantes
+
+Lista los restaurantes disponibles paginados, en orden alfabético por nombre. Requiere autenticación como CLIENTE.
+
+### Endpoint
+
+| Metodo | Ruta | Descripcion | Autenticacion  |
+|--------|------|-------------|----------------|
+| GET    | `/restaurantes?page=0&size=10` | Listar restaurantes paginados | CLIENTE |
+
+### Response 200
+
+```json
+{
+  "contenido": [
+    { "nombre": "La Tagliata", "urlLogo": "http://logo.com/logo.png" }
+  ],
+  "paginaActual": 0,
+  "totalPaginas": 5,
+  "totalElementos": 50
+}
+```
+
 ## Proximas HU (pendientes)
 
-- H9: Cliente lista restaurantes
 - H10: Cliente lista platos de un restaurante
