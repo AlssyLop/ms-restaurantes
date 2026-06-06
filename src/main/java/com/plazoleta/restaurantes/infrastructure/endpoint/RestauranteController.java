@@ -3,7 +3,9 @@ package com.plazoleta.restaurantes.infrastructure.endpoint;
 import com.plazoleta.restaurantes.application.dto.request.RestaurantePost;
 import com.plazoleta.restaurantes.application.dto.response.PlatoPageResponse;
 import com.plazoleta.restaurantes.application.dto.response.RestauranteCreado;
+import com.plazoleta.restaurantes.application.dto.response.RestauranteInfoResponse;
 import com.plazoleta.restaurantes.application.dto.response.RestaurantePageResponse;
+import com.plazoleta.restaurantes.application.handle.ConsultarRestauranteHandle;
 import com.plazoleta.restaurantes.application.handle.ListarPlatosRestauranteHandle;
 import com.plazoleta.restaurantes.application.handle.ListarRestaurantesHandle;
 import com.plazoleta.restaurantes.application.handle.RestauranteHandle;
@@ -32,13 +34,16 @@ public class RestauranteController {
     private final RestauranteHandle restauranteHandle;
     private final ListarRestaurantesHandle listarRestaurantesHandle;
     private final ListarPlatosRestauranteHandle listarPlatosRestauranteHandle;
+    private final ConsultarRestauranteHandle consultarRestauranteHandle;
 
     public RestauranteController(RestauranteHandle restauranteHandle,
                                  ListarRestaurantesHandle listarRestaurantesHandle,
-                                 ListarPlatosRestauranteHandle listarPlatosRestauranteHandle) {
+                                 ListarPlatosRestauranteHandle listarPlatosRestauranteHandle,
+                                 ConsultarRestauranteHandle consultarRestauranteHandle) {
         this.restauranteHandle = restauranteHandle;
         this.listarRestaurantesHandle = listarRestaurantesHandle;
         this.listarPlatosRestauranteHandle = listarPlatosRestauranteHandle;
+        this.consultarRestauranteHandle = consultarRestauranteHandle;
     }
 
     @PostMapping
@@ -84,5 +89,18 @@ public class RestauranteController {
         PlatoPageResponse response = listarPlatosRestauranteHandle.listarPlatos(
                 idRestaurante, categoria, page, size);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/propietario/{idPropietario}")
+    @Operation(summary = "Obtener restaurante por propietario",
+            description = "Retorna el restaurante asociado a un propietario. Usado por ms-pedidos.")
+    @ApiResponse(responseCode = "200", description = "Restaurante encontrado",
+            content = @Content(schema = @Schema(implementation = RestauranteInfoResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Restaurante no encontrado para el propietario")
+    public ResponseEntity<RestauranteInfoResponse> obtenerRestaurantePorPropietario(
+            @PathVariable Long idPropietario) {
+        return consultarRestauranteHandle.obtenerPorPropietario(idPropietario)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
