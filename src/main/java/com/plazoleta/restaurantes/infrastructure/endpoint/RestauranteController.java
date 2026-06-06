@@ -5,6 +5,7 @@ import com.plazoleta.restaurantes.application.dto.response.PlatoPageResponse;
 import com.plazoleta.restaurantes.application.dto.response.RestauranteCreado;
 import com.plazoleta.restaurantes.application.dto.response.RestauranteInfoResponse;
 import com.plazoleta.restaurantes.application.dto.response.RestaurantePageResponse;
+import com.plazoleta.restaurantes.application.exception.ErrorResponse;
 import com.plazoleta.restaurantes.application.handle.ConsultarRestauranteHandle;
 import com.plazoleta.restaurantes.application.handle.ListarPlatosRestauranteHandle;
 import com.plazoleta.restaurantes.application.handle.ListarRestaurantesHandle;
@@ -52,9 +53,12 @@ public class RestauranteController {
             description = "Crea un restaurante. Requiere autenticacion como ADMINISTRADOR.")
     @ApiResponse(responseCode = "201", description = "Restaurante creado exitosamente",
             content = @Content(schema = @Schema(implementation = RestauranteCreado.class)))
-    @ApiResponse(responseCode = "400", description = "Error de validacion")
-    @ApiResponse(responseCode = "404", description = "Propietario no encontrado")
-    @ApiResponse(responseCode = "409", description = "Conflicto (nombre o NIT duplicado)")
+    @ApiResponse(responseCode = "400", description = "Error de validacion",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Propietario no encontrado",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "409", description = "Conflicto (nombre o NIT duplicado)",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<RestauranteCreado> crearRestaurante(
             @Valid @RequestBody RestaurantePost request) {
         RestauranteCreado response = restauranteHandle.crearRestaurante(request);
@@ -80,7 +84,8 @@ public class RestauranteController {
             description = "Lista los platos activos de un restaurante, con paginacion y filtro opcional por categoria.")
     @ApiResponse(responseCode = "200", description = "Listado de platos paginado",
             content = @Content(schema = @Schema(implementation = PlatoPageResponse.class)))
-    @ApiResponse(responseCode = "404", description = "Restaurante no encontrado")
+    @ApiResponse(responseCode = "404", description = "Restaurante no encontrado",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<PlatoPageResponse> listarPlatosRestaurante(
             @PathVariable Long idRestaurante,
             @RequestParam(defaultValue = "0") int page,
@@ -96,7 +101,8 @@ public class RestauranteController {
             description = "Retorna el restaurante asociado a un propietario. Usado por ms-pedidos.")
     @ApiResponse(responseCode = "200", description = "Restaurante encontrado",
             content = @Content(schema = @Schema(implementation = RestauranteInfoResponse.class)))
-    @ApiResponse(responseCode = "404", description = "Restaurante no encontrado para el propietario")
+    @ApiResponse(responseCode = "404", description = "Restaurante no encontrado para el propietario",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<RestauranteInfoResponse> obtenerRestaurantePorPropietario(
             @PathVariable Long idPropietario) {
         return consultarRestauranteHandle.obtenerPorPropietario(idPropietario)

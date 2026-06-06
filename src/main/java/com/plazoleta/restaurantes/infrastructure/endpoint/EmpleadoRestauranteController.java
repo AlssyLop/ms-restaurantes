@@ -3,6 +3,7 @@ package com.plazoleta.restaurantes.infrastructure.endpoint;
 import com.plazoleta.restaurantes.application.dto.request.AsociarEmpleadoRequest;
 import com.plazoleta.restaurantes.application.dto.response.AsociarEmpleadoResponse;
 import com.plazoleta.restaurantes.application.dto.response.EmpleadoRestauranteResponse;
+import com.plazoleta.restaurantes.application.exception.ErrorResponse;
 import com.plazoleta.restaurantes.application.handle.EmpleadoRestauranteHandle;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,9 +37,12 @@ public class EmpleadoRestauranteController {
             description = "Asocia un empleado al restaurante del propietario autenticado. Requiere rol PROPIETARIO.")
     @ApiResponse(responseCode = "201", description = "Empleado asociado exitosamente",
             content = @Content(schema = @Schema(implementation = AsociarEmpleadoResponse.class)))
-    @ApiResponse(responseCode = "400", description = "Error de validacion")
-    @ApiResponse(responseCode = "401", description = "No autorizado")
-    @ApiResponse(responseCode = "404", description = "Restaurante no encontrado para el propietario")
+    @ApiResponse(responseCode = "400", description = "Error de validacion",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "401", description = "No autorizado",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Restaurante no encontrado para el propietario",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<AsociarEmpleadoResponse> asociarEmpleado(
             @RequestBody AsociarEmpleadoRequest request) {
         AsociarEmpleadoResponse response = empleadoRestauranteHandle.asociar(request);

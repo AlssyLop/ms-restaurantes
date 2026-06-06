@@ -5,6 +5,7 @@ import com.plazoleta.restaurantes.application.dto.request.ModificarPlatoRequest;
 import com.plazoleta.restaurantes.application.dto.response.CrearPlatoResponse;
 import com.plazoleta.restaurantes.application.dto.response.GestionarPlatoResponse;
 import com.plazoleta.restaurantes.application.dto.response.ModificarPlatoResponse;
+import com.plazoleta.restaurantes.application.exception.ErrorResponse;
 import com.plazoleta.restaurantes.application.handle.CrearPlatoHandle;
 import com.plazoleta.restaurantes.application.handle.GestionarPlatoHandle;
 import com.plazoleta.restaurantes.application.handle.ModificarPlatoHandle;
@@ -47,9 +48,12 @@ public class PlatoController {
             description = "Crea un plato asociado al restaurante del propietario autenticado.")
     @ApiResponse(responseCode = "201", description = "Plato creado exitosamente",
             content = @Content(schema = @Schema(implementation = CrearPlatoResponse.class)))
-    @ApiResponse(responseCode = "400", description = "Error de validacion")
-    @ApiResponse(responseCode = "404", description = "Propietario no encontrado o sin restaurante")
-    @ApiResponse(responseCode = "409", description = "Conflicto (nombre de plato duplicado en el restaurante)")
+    @ApiResponse(responseCode = "400", description = "Error de validacion",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Propietario no encontrado o sin restaurante",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "409", description = "Conflicto (nombre de plato duplicado en el restaurante)",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<CrearPlatoResponse> crearPlato(@RequestBody CrearPlatoRequest request) {
         CrearPlatoResponse response = crearPlatoHandle.crearPlato(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -61,9 +65,12 @@ public class PlatoController {
             description = "Modifica precio y/o descripcion de un plato del propietario autenticado.")
     @ApiResponse(responseCode = "200", description = "Plato modificado exitosamente",
             content = @Content(schema = @Schema(implementation = ModificarPlatoResponse.class)))
-    @ApiResponse(responseCode = "400", description = "Error de validacion")
-    @ApiResponse(responseCode = "403", description = "No autorizado para modificar este plato")
-    @ApiResponse(responseCode = "404", description = "Plato o propietario no encontrado")
+    @ApiResponse(responseCode = "400", description = "Error de validacion",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "403", description = "No autorizado para modificar este plato",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Plato o propietario no encontrado",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<ModificarPlatoResponse> modificarPlato(
             @PathVariable Long idPlato, @RequestBody ModificarPlatoRequest request) {
         ModificarPlatoResponse response = modificarPlatoHandle.modificarPlato(idPlato, request);
@@ -76,9 +83,12 @@ public class PlatoController {
             description = "Habilita un plato del restaurante del propietario autenticado.")
     @ApiResponse(responseCode = "200", description = "Plato habilitado exitosamente",
             content = @Content(schema = @Schema(implementation = GestionarPlatoResponse.class)))
-    @ApiResponse(responseCode = "400", description = "El plato ya se encuentra habilitado")
-    @ApiResponse(responseCode = "403", description = "No autorizado para modificar este plato")
-    @ApiResponse(responseCode = "404", description = "Plato o propietario no encontrado")
+    @ApiResponse(responseCode = "400", description = "El plato ya se encuentra habilitado",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "403", description = "No autorizado para modificar este plato",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Plato o propietario no encontrado",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<GestionarPlatoResponse> habilitarPlato(@PathVariable Long idPlato) {
         GestionarPlatoResponse response = gestionarPlatoHandle.habilitar(idPlato);
         return ResponseEntity.ok(response);
@@ -90,9 +100,12 @@ public class PlatoController {
             description = "Deshabilita un plato del restaurante del propietario autenticado.")
     @ApiResponse(responseCode = "200", description = "Plato deshabilitado exitosamente",
             content = @Content(schema = @Schema(implementation = GestionarPlatoResponse.class)))
-    @ApiResponse(responseCode = "400", description = "El plato ya se encuentra deshabilitado")
-    @ApiResponse(responseCode = "403", description = "No autorizado para modificar este plato")
-    @ApiResponse(responseCode = "404", description = "Plato o propietario no encontrado")
+    @ApiResponse(responseCode = "400", description = "El plato ya se encuentra deshabilitado",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "403", description = "No autorizado para modificar este plato",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    @ApiResponse(responseCode = "404", description = "Plato o propietario no encontrado",
+            content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<GestionarPlatoResponse> deshabilitarPlato(@PathVariable Long idPlato) {
         GestionarPlatoResponse response = gestionarPlatoHandle.deshabilitar(idPlato);
         return ResponseEntity.ok(response);
