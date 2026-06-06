@@ -1,24 +1,31 @@
 package com.plazoleta.restaurantes.application.dto.request;
 
-import com.plazoleta.restaurantes.dominio.modelo.value.CategoriaPlato;
-import com.plazoleta.restaurantes.dominio.modelo.value.DescripcionPlato;
-import com.plazoleta.restaurantes.dominio.modelo.value.NombrePlato;
-import com.plazoleta.restaurantes.dominio.modelo.value.PrecioPlato;
-import com.plazoleta.restaurantes.dominio.modelo.value.UrlImagen;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 public class CrearPlatoRequest {
 
-    private NombrePlato nombre;
-    private PrecioPlato precio;
-    private DescripcionPlato descripcion;
-    private UrlImagen urlImagen;
-    private CategoriaPlato categoria;
+    @Schema(description = "Nombre del plato", example = "Pasta Carbonara")
+    private String nombre;
+
+    @Schema(description = "Precio del plato (entero positivo)", example = "25000")
+    private Integer precio;
+
+    @Schema(description = "Descripcion del plato", example = "Pasta con crema, huevo y panceta")
+    private String descripcion;
+
+    @Schema(description = "URL de la imagen del plato", example = "https://example.com/plato.png")
+    private String urlImagen;
+
+    @Schema(description = "Categoria del plato", example = "Italiana")
+    private String categoria;
+
+    @Schema(description = "ID del propietario", example = "1")
     private Long idPropietario;
 
     public CrearPlatoRequest() {}
 
-    public CrearPlatoRequest(NombrePlato nombre, PrecioPlato precio, DescripcionPlato descripcion,
-                             UrlImagen urlImagen, CategoriaPlato categoria, Long idPropietario) {
+    public CrearPlatoRequest(String nombre, Integer precio, String descripcion,
+                              String urlImagen, String categoria, Long idPropietario) {
         this.nombre = nombre;
         this.precio = precio;
         this.descripcion = descripcion;
@@ -27,20 +34,20 @@ public class CrearPlatoRequest {
         this.idPropietario = idPropietario;
     }
 
-    public NombrePlato getNombre() { return nombre; }
-    public void setNombre(NombrePlato nombre) { this.nombre = nombre; }
+    public String getNombre() { return nombre; }
+    public void setNombre(String nombre) { this.nombre = nombre; }
 
-    public PrecioPlato getPrecio() { return precio; }
-    public void setPrecio(PrecioPlato precio) { this.precio = precio; }
+    public Integer getPrecio() { return precio; }
+    public void setPrecio(Integer precio) { this.precio = precio; }
 
-    public DescripcionPlato getDescripcion() { return descripcion; }
-    public void setDescripcion(DescripcionPlato descripcion) { this.descripcion = descripcion; }
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
 
-    public UrlImagen getUrlImagen() { return urlImagen; }
-    public void setUrlImagen(UrlImagen urlImagen) { this.urlImagen = urlImagen; }
+    public String getUrlImagen() { return urlImagen; }
+    public void setUrlImagen(String urlImagen) { this.urlImagen = urlImagen; }
 
-    public CategoriaPlato getCategoria() { return categoria; }
-    public void setCategoria(CategoriaPlato categoria) { this.categoria = categoria; }
+    public String getCategoria() { return categoria; }
+    public void setCategoria(String categoria) { this.categoria = categoria; }
 
     public Long getIdPropietario() { return idPropietario; }
     public void setIdPropietario(Long idPropietario) { this.idPropietario = idPropietario; }
