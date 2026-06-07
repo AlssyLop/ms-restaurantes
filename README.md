@@ -62,7 +62,7 @@ Conexion local: `root/root` en `localhost:3306/plazoleta_restaurantes`.
 
 ```bash
 ./mvnw spring-boot:run    # Puerto 8082
-./mvnw clean test         # Pruebas unitarias (46 tests)
+./mvnw clean test         # Pruebas unitarias (52 tests)
 ```
 
 ## Endpoints Implementados
@@ -72,7 +72,11 @@ Conexion local: `root/root` en `localhost:3306/plazoleta_restaurantes`.
 | POST   | `/restaurantes`     | Crear restaurante                         | ADMINISTRADOR  |
 | POST   | `/platos`           | Crear plato                               | PROPIETARIO    |
 | PUT    | `/platos/{idPlato}` | Modificar precio/descripcion de un plato  | PROPIETARIO    |
+| PATCH  | `/platos/{idPlato}/habilitar`   | Habilitar plato             | PROPIETARIO    |
+| PATCH  | `/platos/{idPlato}/deshabilitar`| Deshabilitar plato          | PROPIETARIO    |
 | POST   | `/restaurantes/empleados` | Asociar empleado a restaurante       | PROPIETARIO    |
+| GET    | `/restaurantes?page=0&size=10` | Listar restaurantes paginados       | CLIENTE        |
+| GET    | `/restaurantes/{idRestaurante}/platos?page=0&size=10&categoria=` | Listar platos del restaurante | CLIENTE |
 
 Documentacion OpenAPI disponible en `/swagger-ui.html` y `/v3/api-docs`.
 
@@ -87,7 +91,7 @@ Authorization: Bearer <token>
 - **401** — token ausente, inválido o expirado (sin body)
 - **403** — token válido pero rol insuficiente (sin body)
 
-La validación usa la misma clave secreta (`jwt.secret`) compartida con `ms-usuarios`.
+La validación usa la **llave pública RSA-4096** (`jwt.public-key`) proporcionada por `ms-usuarios`.
 
 ---
 
