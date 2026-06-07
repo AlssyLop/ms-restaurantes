@@ -19,6 +19,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -97,14 +98,21 @@ public class RestauranteController {
     }
 
     @GetMapping("/propietario/{idPropietario}")
+    @PreAuthorize("hasRole('PROPIETARIO')")
     @Operation(summary = "Obtener restaurante por propietario",
-            description = "Retorna el restaurante asociado a un propietario. Usado por ms-pedidos.")
+            description = "Retorna el restaurante asociado al propietario autenticado. Usado por ms-pedidos.")
     @ApiResponse(responseCode = "200", description = "Restaurante encontrado",
             content = @Content(schema = @Schema(implementation = RestauranteInfoResponse.class)))
+    @ApiResponse(responseCode = "403", description = "El propietario autenticado no corresponde al ID solicitado")
     @ApiResponse(responseCode = "404", description = "Restaurante no encontrado para el propietario",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<RestauranteInfoResponse> obtenerRestaurantePorPropietario(
-            @PathVariable Long idPropietario) {
+            @PathVariable Long idPropietario,
+            Authentication authentication) {
+        Long idUsuarioAutenticado = (Long) authentication.getPrincipal();
+        if (!idUsuarioAutenticado.equals(idPropietario)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         return consultarRestauranteHandle.obtenerPorPropietario(idPropietario)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());

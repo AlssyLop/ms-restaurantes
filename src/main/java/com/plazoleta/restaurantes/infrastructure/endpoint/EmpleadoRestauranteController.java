@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,13 +51,20 @@ public class EmpleadoRestauranteController {
     }
 
     @GetMapping("/empleado/{idEmpleado}")
+    @PreAuthorize("hasRole('EMPLEADO')")
     @Operation(summary = "Obtener restaurante del empleado",
-            description = "Retorna el restaurante al que pertenece un empleado. Usado por ms-pedidos para filtrar pedidos.")
+            description = "Retorna el restaurante al que pertenece el empleado autenticado. Usado por ms-pedidos para filtrar pedidos.")
     @ApiResponse(responseCode = "200", description = "Empleado encontrado",
             content = @Content(schema = @Schema(implementation = EmpleadoRestauranteResponse.class)))
+    @ApiResponse(responseCode = "403", description = "El empleado autenticado no corresponde al ID solicitado")
     @ApiResponse(responseCode = "404", description = "Empleado no asociado a ningun restaurante")
     public ResponseEntity<EmpleadoRestauranteResponse> obtenerRestauranteEmpleado(
-            @PathVariable Long idEmpleado) {
+            @PathVariable Long idEmpleado,
+            Authentication authentication) {
+        Long idUsuarioAutenticado = (Long) authentication.getPrincipal();
+        if (!idUsuarioAutenticado.equals(idEmpleado)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
         EmpleadoRestauranteResponse response = empleadoRestauranteHandle.obtenerRestauranteDelEmpleado(idEmpleado);
         return ResponseEntity.ok(response);
     }
