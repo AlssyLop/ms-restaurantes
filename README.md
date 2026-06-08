@@ -290,3 +290,45 @@ Lista los platos activos de un restaurante, con paginación y filtro opcional po
 ### Response 404
 
 Restaurante no encontrado (sin body).
+
+---
+
+## Relacion con otros microservicios
+
+```
++------------------+      RSA-4096 RS256 (verificacion)     +------------------+
+|  ms-restaurantes |  <-------------------------------------- |   ms-usuarios    |
+|   Puerto 8082    |                                         |  (emisor JWT)  |
++------------------+                                         +------------------+
+         ^
+         | RestTemplate (valida propietario / platos)
+         |
++------------------+      RestTemplate (valida restaurante / platos info)
+|   ms-pedidos     |  --------------------------------------->
+|   Puerto 8083    |
++------------------+
+         |
+         | RestTemplate (H6: asocia empleado)
+         v
++------------------+
+|  ms-usuarios     |
+|   Puerto 8081    |
++------------------+
+```
+
+| Microservicio | Relacion | Como interactua |
+|---------------|----------|-----------------|
+| **ms-usuarios** | **Valida propietario** | `ms-restaurantes` llama a `GET /usuarios/{id}` para verificar que el propietario exista y tenga rol `PROPIETARIO` al crear un restaurante. |
+| **ms-usuarios** | **Recibe empleado** | `ms-usuarios` crea el empleado y luego llama a `POST /restaurantes/empleados` para asociarlo al restaurante (H6). |
+| **ms-pedidos** | **Provee informacion** | `ms-pedidos` consulta `GET /restaurantes/{id}` para validar existencia del restaurante, y `POST /restaurantes/{id}/platos/info` para obtener nombres y validar activos de platos. |
+
+### Flujo de creacion de restaurante (H2)
+
+1. ADMINISTRADOR autenticado -> `POST /restaurantes` en **ms-restaurantes**
+2. `ms-restaurantes` -> `GET /usuarios/{idPropietario}` en **ms-usuarios** (valida existencia + rol PROPIETARIO)
+3. Si validacion OK, persiste el restaurante en MySQL
+
+### Flujo de obtencion de informacion de platos (para ms-pedidos)
+
+1. **ms-pedidos** -> `GET /restaurantes/{id}` en **ms-restaurantes** (valida existencia del restaurante)
+2. **ms-pedidos** -> `POST /restaurantes/{id}/platos/info` en **ms-restaurantes** (valida pertenencia + activos + devuelve nombres de platos)
