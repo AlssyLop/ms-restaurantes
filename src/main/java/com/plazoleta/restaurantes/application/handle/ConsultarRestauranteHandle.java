@@ -20,4 +20,9 @@ public class ConsultarRestauranteHandle {
         return restauranteRepository.findByIdPropietario(idPropietario)
                 .map(r -> new RestauranteInfoResponse(r.getId(), r.getNombre().getValor()));
     }
+
+    public Optional<RestauranteInfoResponse> obtenerPorId(Long id) {
+        return restauranteRepository.findById(id)
+                .map(r -> new RestauranteInfoResponse(r.getId(), r.getNombre().getValor()));
+    }
 }
