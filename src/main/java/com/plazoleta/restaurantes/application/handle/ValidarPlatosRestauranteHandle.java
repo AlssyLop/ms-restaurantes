@@ -16,4 +16,8 @@ public class ValidarPlatosRestauranteHandle {
     public List<Long> validarPertenencia(Long idRestaurante, List<Long> idsPlatos) {
         return platoRepository.findIdsByIdRestauranteAndIdIn(idRestaurante, idsPlatos);
     }
+
+    public List<Long> validarActivos(List<Long> idsPlatos) {
+        return platoRepository.findIdsByIdInAndActivoTrue(idsPlatos);
+    }
 }

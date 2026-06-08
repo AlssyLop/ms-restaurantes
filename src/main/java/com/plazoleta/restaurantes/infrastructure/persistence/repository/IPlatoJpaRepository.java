@@ -11,4 +11,5 @@ public interface IPlatoJpaRepository extends JpaRepository<EntidadPlato, Long> {
     Page<EntidadPlato> findByIdRestauranteAndActivoTrue(Long idRestaurante, Pageable pageable);
     Page<EntidadPlato> findByIdRestauranteAndActivoTrueAndCategoria(Long idRestaurante, String categoria, Pageable pageable);
     List<EntidadPlato> findByIdRestauranteAndIdIn(Long idRestaurante, List<Long> ids);
+    List<EntidadPlato> findByIdInAndActivoTrue(List<Long> ids);
 }

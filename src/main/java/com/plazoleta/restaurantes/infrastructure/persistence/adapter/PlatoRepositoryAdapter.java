@@ -62,4 +62,12 @@ public class PlatoRepositoryAdapter implements PlatoRepositoryPort {
                 .map(EntidadPlato::getId)
                 .toList();
     }
+
+    @Override
+    public List<Long> findIdsByIdInAndActivoTrue(List<Long> ids) {
+        return jpaRepository.findByIdInAndActivoTrue(ids)
+                .stream()
+                .map(EntidadPlato::getId)
+                .toList();
+    }
 }

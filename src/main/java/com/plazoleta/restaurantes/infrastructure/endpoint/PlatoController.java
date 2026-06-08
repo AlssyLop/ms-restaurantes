@@ -9,11 +9,13 @@ import com.plazoleta.restaurantes.application.exception.ErrorResponse;
 import com.plazoleta.restaurantes.application.handle.CrearPlatoHandle;
 import com.plazoleta.restaurantes.application.handle.GestionarPlatoHandle;
 import com.plazoleta.restaurantes.application.handle.ModificarPlatoHandle;
+import com.plazoleta.restaurantes.application.handle.ValidarPlatosRestauranteHandle;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -34,13 +36,16 @@ public class PlatoController {
     private final CrearPlatoHandle crearPlatoHandle;
     private final ModificarPlatoHandle modificarPlatoHandle;
     private final GestionarPlatoHandle gestionarPlatoHandle;
+    private final ValidarPlatosRestauranteHandle validarPlatosRestauranteHandle;
 
     public PlatoController(CrearPlatoHandle crearPlatoHandle,
                            ModificarPlatoHandle modificarPlatoHandle,
-                           GestionarPlatoHandle gestionarPlatoHandle) {
+                           GestionarPlatoHandle gestionarPlatoHandle,
+                           ValidarPlatosRestauranteHandle validarPlatosRestauranteHandle) {
         this.crearPlatoHandle = crearPlatoHandle;
         this.modificarPlatoHandle = modificarPlatoHandle;
         this.gestionarPlatoHandle = gestionarPlatoHandle;
+        this.validarPlatosRestauranteHandle = validarPlatosRestauranteHandle;
     }
 
     @PostMapping
@@ -114,5 +119,14 @@ public class PlatoController {
     public ResponseEntity<GestionarPlatoResponse> deshabilitarPlato(@PathVariable Long idPlato) {
         GestionarPlatoResponse response = gestionarPlatoHandle.deshabilitar(idPlato);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/validar-activos")
+    @PreAuthorize("hasRole('CLIENTE')")
+    @Operation(summary = "Validar platos activos",
+            description = "Recibe una lista de IDs de platos y retorna los que estan activos. Usado internamente por ms-pedidos.")
+    public ResponseEntity<List<Long>> validarPlatosActivos(@RequestBody List<Long> idsPlatos) {
+        List<Long> activos = validarPlatosRestauranteHandle.validarActivos(idsPlatos);
+        return ResponseEntity.ok(activos);
     }
 }
