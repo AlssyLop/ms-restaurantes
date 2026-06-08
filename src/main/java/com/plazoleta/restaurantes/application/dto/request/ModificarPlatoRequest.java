@@ -4,14 +4,12 @@ public class ModificarPlatoRequest {
 
     private Integer precio;
     private String descripcion;
-    private Long idPropietario;
 
     public ModificarPlatoRequest() {}
 
-    public ModificarPlatoRequest(Integer precio, String descripcion, Long idPropietario) {
+    public ModificarPlatoRequest(Integer precio, String descripcion) {
         this.precio = precio;
         this.descripcion = descripcion;
-        this.idPropietario = idPropietario;
     }
 
     public Integer getPrecio() { return precio; }
@@ -19,7 +17,4 @@ public class ModificarPlatoRequest {
 
     public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
-
-    public Long getIdPropietario() { return idPropietario; }
-    public void setIdPropietario(Long idPropietario) { this.idPropietario = idPropietario; }
 }

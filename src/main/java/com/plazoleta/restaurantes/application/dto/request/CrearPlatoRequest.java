@@ -19,19 +19,15 @@ public class CrearPlatoRequest {
     @Schema(description = "Categoria del plato", example = "Italiana")
     private String categoria;
 
-    @Schema(description = "ID del propietario", example = "1")
-    private Long idPropietario;
-
     public CrearPlatoRequest() {}
 
     public CrearPlatoRequest(String nombre, Integer precio, String descripcion,
-                              String urlImagen, String categoria, Long idPropietario) {
+                               String urlImagen, String categoria) {
         this.nombre = nombre;
         this.precio = precio;
         this.descripcion = descripcion;
         this.urlImagen = urlImagen;
         this.categoria = categoria;
-        this.idPropietario = idPropietario;
     }
 
     public String getNombre() { return nombre; }
@@ -48,7 +44,4 @@ public class CrearPlatoRequest {
 
     public String getCategoria() { return categoria; }
     public void setCategoria(String categoria) { this.categoria = categoria; }
-
-    public Long getIdPropietario() { return idPropietario; }
-    public void setIdPropietario(Long idPropietario) { this.idPropietario = idPropietario; }
 }

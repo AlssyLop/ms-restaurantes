@@ -20,9 +20,9 @@ public class CrearPlatoHandle {
         this.platoFactory = platoFactory;
     }
 
-    public CrearPlatoResponse crearPlato(CrearPlatoRequest request) {
+    public CrearPlatoResponse crearPlato(CrearPlatoRequest request, Long idPropietario) {
         Plato plato = platoFactory.toDomain(request);
-        crearPlatoPort.crearPlato(plato, request.getIdPropietario());
+        crearPlatoPort.crearPlato(plato, idPropietario);
         return new CrearPlatoResponse("Plato creado exitosamente");
     }
 }

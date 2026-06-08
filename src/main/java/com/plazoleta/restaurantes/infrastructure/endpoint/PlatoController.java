@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,8 +55,10 @@ public class PlatoController {
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     @ApiResponse(responseCode = "409", description = "Conflicto (nombre de plato duplicado en el restaurante)",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    public ResponseEntity<CrearPlatoResponse> crearPlato(@RequestBody CrearPlatoRequest request) {
-        CrearPlatoResponse response = crearPlatoHandle.crearPlato(request);
+    public ResponseEntity<CrearPlatoResponse> crearPlato(@RequestBody CrearPlatoRequest request,
+                                                          Authentication authentication) {
+        Long idPropietario = (Long) authentication.getPrincipal();
+        CrearPlatoResponse response = crearPlatoHandle.crearPlato(request, idPropietario);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -72,8 +75,10 @@ public class PlatoController {
     @ApiResponse(responseCode = "404", description = "Plato o propietario no encontrado",
             content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     public ResponseEntity<ModificarPlatoResponse> modificarPlato(
-            @PathVariable Long idPlato, @RequestBody ModificarPlatoRequest request) {
-        ModificarPlatoResponse response = modificarPlatoHandle.modificarPlato(idPlato, request);
+            @PathVariable Long idPlato, @RequestBody ModificarPlatoRequest request,
+            Authentication authentication) {
+        Long idPropietario = (Long) authentication.getPrincipal();
+        ModificarPlatoResponse response = modificarPlatoHandle.modificarPlato(idPlato, request, idPropietario);
         return ResponseEntity.ok(response);
     }
 

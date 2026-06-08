@@ -16,9 +16,9 @@ public class ModificarPlatoHandle {
         this.modificarPlatoPort = modificarPlatoPort;
     }
 
-    public ModificarPlatoResponse modificarPlato(Long idPlato, ModificarPlatoRequest request) {
+    public ModificarPlatoResponse modificarPlato(Long idPlato, ModificarPlatoRequest request, Long idPropietario) {
         modificarPlatoPort.modificarPlato(idPlato, request.getPrecio(),
-                request.getDescripcion(), request.getIdPropietario());
+                request.getDescripcion(), idPropietario);
         return new ModificarPlatoResponse("Plato modificado exitosamente");
     }
 }
