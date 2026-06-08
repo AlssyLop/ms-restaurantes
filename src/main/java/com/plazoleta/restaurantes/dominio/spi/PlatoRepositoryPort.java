@@ -2,6 +2,7 @@ package com.plazoleta.restaurantes.dominio.spi;
 
 import com.plazoleta.restaurantes.dominio.modelo.Plato;
 import com.plazoleta.restaurantes.dominio.modelo.value.NombrePlato;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,4 +13,5 @@ public interface PlatoRepositoryPort {
     Optional<Plato> findById(Long id);
     Page<Plato> findByIdRestauranteAndActivoTrue(Long idRestaurante, Pageable pageable);
     Page<Plato> findByIdRestauranteAndActivoTrueAndCategoria(Long idRestaurante, String categoria, Pageable pageable);
+    List<Long> findIdsByIdRestauranteAndIdIn(Long idRestaurante, List<Long> ids);
 }

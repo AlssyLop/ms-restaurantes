@@ -10,12 +10,14 @@ import com.plazoleta.restaurantes.application.handle.ConsultarRestauranteHandle;
 import com.plazoleta.restaurantes.application.handle.ListarPlatosRestauranteHandle;
 import com.plazoleta.restaurantes.application.handle.ListarRestaurantesHandle;
 import com.plazoleta.restaurantes.application.handle.RestauranteHandle;
+import com.plazoleta.restaurantes.application.handle.ValidarPlatosRestauranteHandle;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -37,15 +39,18 @@ public class RestauranteController {
     private final ListarRestaurantesHandle listarRestaurantesHandle;
     private final ListarPlatosRestauranteHandle listarPlatosRestauranteHandle;
     private final ConsultarRestauranteHandle consultarRestauranteHandle;
+    private final ValidarPlatosRestauranteHandle validarPlatosRestauranteHandle;
 
     public RestauranteController(RestauranteHandle restauranteHandle,
-                                 ListarRestaurantesHandle listarRestaurantesHandle,
-                                 ListarPlatosRestauranteHandle listarPlatosRestauranteHandle,
-                                 ConsultarRestauranteHandle consultarRestauranteHandle) {
+                                  ListarRestaurantesHandle listarRestaurantesHandle,
+                                  ListarPlatosRestauranteHandle listarPlatosRestauranteHandle,
+                                  ConsultarRestauranteHandle consultarRestauranteHandle,
+                                  ValidarPlatosRestauranteHandle validarPlatosRestauranteHandle) {
         this.restauranteHandle = restauranteHandle;
         this.listarRestaurantesHandle = listarRestaurantesHandle;
         this.listarPlatosRestauranteHandle = listarPlatosRestauranteHandle;
         this.consultarRestauranteHandle = consultarRestauranteHandle;
+        this.validarPlatosRestauranteHandle = validarPlatosRestauranteHandle;
     }
 
     @PostMapping
@@ -108,6 +113,17 @@ public class RestauranteController {
         return consultarRestauranteHandle.obtenerPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{idRestaurante}/platos/validar-pertenencia")
+    @PreAuthorize("hasRole('CLIENTE')")
+    @Operation(summary = "Validar pertenencia de platos a restaurante",
+            description = "Recibe una lista de IDs de platos y retorna los que pertenecen al restaurante. Usado internamente por ms-pedidos.")
+    public ResponseEntity<List<Long>> validarPlatosPertenencia(
+            @PathVariable Long idRestaurante,
+            @RequestBody List<Long> idsPlatos) {
+        List<Long> validos = validarPlatosRestauranteHandle.validarPertenencia(idRestaurante, idsPlatos);
+        return ResponseEntity.ok(validos);
     }
 
     @GetMapping("/propietario/{idPropietario}")
