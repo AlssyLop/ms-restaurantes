@@ -98,9 +98,9 @@ public class RestauranteController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('CLIENTE')")
     @Operation(summary = "Obtener restaurante por ID",
-            description = "Retorna la informacion basica de un restaurante. Usado internamente por ms-pedidos.")
+            description = "Retorna la informacion basica de un restaurante. Usado internamente por ms-pedidos al crear un pedido.")
     @ApiResponse(responseCode = "200", description = "Restaurante encontrado",
             content = @Content(schema = @Schema(implementation = RestauranteInfoResponse.class)))
     @ApiResponse(responseCode = "404", description = "Restaurante no encontrado")
