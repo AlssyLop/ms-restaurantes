@@ -70,4 +70,12 @@ public class PlatoRepositoryAdapter implements PlatoRepositoryPort {
                 .map(EntidadPlato::getId)
                 .toList();
     }
+
+    @Override
+    public List<Plato> findByIdRestauranteAndIdIn(Long idRestaurante, List<Long> ids) {
+        return jpaRepository.findByIdRestauranteAndIdIn(idRestaurante, ids)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
 }

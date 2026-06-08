@@ -1,6 +1,7 @@
 package com.plazoleta.restaurantes.infrastructure.endpoint;
 
 import com.plazoleta.restaurantes.application.dto.request.RestaurantePost;
+import com.plazoleta.restaurantes.application.dto.response.PlatoInfoResponse;
 import com.plazoleta.restaurantes.application.dto.response.PlatoPageResponse;
 import com.plazoleta.restaurantes.application.dto.response.RestauranteCreado;
 import com.plazoleta.restaurantes.application.dto.response.RestauranteInfoResponse;
@@ -115,15 +116,15 @@ public class RestauranteController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/{idRestaurante}/platos/validar-pertenencia")
+    @PostMapping("/{idRestaurante}/platos/info")
     @PreAuthorize("hasRole('CLIENTE')")
-    @Operation(summary = "Validar pertenencia de platos a restaurante",
-            description = "Recibe una lista de IDs de platos y retorna los que pertenecen al restaurante. Usado internamente por ms-pedidos.")
-    public ResponseEntity<List<Long>> validarPlatosPertenencia(
+    @Operation(summary = "Consultar info de platos",
+            description = "Recibe una lista de IDs de platos y retorna id, nombre y estado activo. Usado internamente por ms-pedidos al crear un pedido.")
+    public ResponseEntity<List<PlatoInfoResponse>> consultarPlatosInfo(
             @PathVariable Long idRestaurante,
             @RequestBody List<Long> idsPlatos) {
-        List<Long> validos = validarPlatosRestauranteHandle.validarPertenencia(idRestaurante, idsPlatos);
-        return ResponseEntity.ok(validos);
+        List<PlatoInfoResponse> platosInfo = validarPlatosRestauranteHandle.consultarPlatosInfo(idRestaurante, idsPlatos);
+        return ResponseEntity.ok(platosInfo);
     }
 
     @GetMapping("/propietario/{idPropietario}")

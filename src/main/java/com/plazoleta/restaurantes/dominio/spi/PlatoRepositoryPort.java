@@ -15,4 +15,5 @@ public interface PlatoRepositoryPort {
     Page<Plato> findByIdRestauranteAndActivoTrueAndCategoria(Long idRestaurante, String categoria, Pageable pageable);
     List<Long> findIdsByIdRestauranteAndIdIn(Long idRestaurante, List<Long> ids);
     List<Long> findIdsByIdInAndActivoTrue(List<Long> ids);
+    List<Plato> findByIdRestauranteAndIdIn(Long idRestaurante, List<Long> ids);
 }
